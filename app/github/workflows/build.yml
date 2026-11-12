@@ -1,0 +1,43 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Keys local.properties mein daalein
+        env:
+          PICO: ${{ secrets.PICOVOICE_KEY }}
+          GEMINI: ${{ secrets.GEMINI_KEY }}
+        run: |
+          test -n "$PICO" && test -n "$GEMINI"
+          echo "picovoice.key=$PICO" >> local.properties
+          echo "gemini.key=$GEMINI" >> local.properties
+
+      - name: Build debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Release banayein
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Jarvis Latest
+          files: app/build/outputs/apk/debug/app-debug.apk
