@@ -1,0 +1,2 @@
+buildConfigField("String", "PICOVOICE_KEY", "\"${localProps.getProperty("picovoice.key", "")}\"")
+buildConfigField("String", "GEMINI_KEY", "\"${localProps.getProperty("gemini.key", "")}\"")
